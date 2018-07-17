@@ -9,18 +9,9 @@ namespace AmazingCars
     /// </summary>
     public class Game1 : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        private GraphicsDeviceManager graphics;
 
-        Texture2D _carTexture;
-
-        Rectangle carMask;
-        Rectangle interiorMask;
-
-        Vector2 maskOrigin;
-        Vector2 interiorOrigin;
-
-        Car car;
+        private Car car;
 
         public Game1()
         {
@@ -40,8 +31,13 @@ namespace AmazingCars
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            var viewportBounds = GraphicsDevice.Viewport.Bounds;
+            car = new Car(this)
+            {
+                Position = new Vector2(viewportBounds.Width, viewportBounds.Height) * 0.5f
+            };
 
+            this.Components.Add(car);
             base.Initialize();
         }
 
@@ -51,17 +47,6 @@ namespace AmazingCars
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            var viewportBounds = GraphicsDevice.Viewport.Bounds;
-            car = new Car { Position = new Vector2(viewportBounds.Width * 0.5f, viewportBounds.Height * 0.5f) };
-            _carTexture = Content.Load<Texture2D>("Rx-7");
-            carMask = new Rectangle(22, 12, 418, 940);
-            interiorMask = new Rectangle(512 + 22, 12, 418, 940);
-
-            maskOrigin = new Vector2(carMask.Width, carMask.Height) / 2.0f;
-            interiorOrigin = new Vector2(interiorMask.Width, interiorMask.Height) / 2.0f;
         }
 
         /// <summary>
@@ -90,14 +75,11 @@ namespace AmazingCars
             if (keyboardState.IsKeyDown(Keys.S))
                 car.Speed -= 120.0f;
 
-
-            var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            car.TireAngle = 0.0f;
             if (keyboardState.IsKeyDown(Keys.A))
-                car.Heading -= elapsedSeconds;
+                car.TireAngle = -0.5f;
             if (keyboardState.IsKeyDown(Keys.D))
-                car.Heading += elapsedSeconds;
-
-            car.Update(gameTime);
+                car.TireAngle = 0.5f;
             base.Update(gameTime);
         }
 
@@ -109,29 +91,6 @@ namespace AmazingCars
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-
-            spriteBatch.Draw(
-                _carTexture,
-                car.Position,
-                carMask,
-                Color.Red,
-                car.Heading,
-                maskOrigin,
-                Vector2.One * 0.2f,
-                SpriteEffects.None, 0.0f);
-
-            spriteBatch.Draw(
-                _carTexture,
-                car.Position,
-                interiorMask,
-                Color.White,
-                car.Heading,
-                interiorOrigin,
-                Vector2.One * 0.2f,
-                SpriteEffects.None, 0.0f);
-
-            spriteBatch.End();
 
             base.Draw(gameTime);
         }
